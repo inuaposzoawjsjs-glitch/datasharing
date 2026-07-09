@@ -110,7 +110,7 @@ local a, b = {
     }
 }
 
-local Animation = loadstring(game:HttpGet(""))()
+local Animation = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/datasharing/refs/heads/master/Fluent/AnimationGui.lua"))()
 
 getgenv().ShineEnabled = true
 getgenv().ButtonGradients = {
