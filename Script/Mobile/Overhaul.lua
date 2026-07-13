@@ -18,7 +18,7 @@ _G.PhantomWyrmXIsAlreadyRunning = true
 
 local Window = Fluent:CreateWindow({
     Title = "PhantomWyrm Hub X - Evade Overhaul│Mobile",
-    SubTitle = "v3.37.17 Made By Carey",
+    SubTitle = "v3.38.17 Made By Carey",
     TabWidth = 160,
     Size = UDim2.fromOffset(540, 390),
     Acrylic = false,
@@ -6019,6 +6019,15 @@ end
 
     
 -- Exploits
+
+Tabs.Exploits:AddButton({
+        Title = "Boombox",
+        Description = "Not Visual",
+        Callback = function()
+            loadstring(game:HttpGet("https://darahub.pages.dev/api/script/obfuscated/Fe/Boomboxs/EvadeOverhaul-RelicsXYZ.lua"))()
+        end
+    }
+)
  
 local FakeSection = Tabs.Exploits:AddSection("Pads")
 
