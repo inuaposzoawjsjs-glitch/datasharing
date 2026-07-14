@@ -3680,7 +3680,7 @@ local function toggleFly(toggleValue)
     end
 end
 
-Tabs.Misc:AddKeybind("FlyKeybind", {
+Tabs.Main:AddKeybind("FlyKeybind", {
     Title = "Fly Toggle",
     Mode = "Toggle",
     Default = "F",
@@ -3689,7 +3689,7 @@ Tabs.Misc:AddKeybind("FlyKeybind", {
     end
 })
 
-local FlySpeedInput = Tabs.Misc:AddInput("FlySpeedInput", {
+local FlySpeedInput = Tabs.Main:AddInput("FlySpeedInput", {
     Title = "Fly Speed",
     Default = tostring(_G.flySpeed),
     Placeholder = "Enter fly speed",
