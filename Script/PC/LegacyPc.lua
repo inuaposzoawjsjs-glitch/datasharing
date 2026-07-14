@@ -18,7 +18,7 @@ _G.PhantomWyrmXIsAlreadyRunning = true
 
 local Window = Fluent:CreateWindow({
     Title = "PhantomWyrm Hub X - Evade Legacy│PC",
-    SubTitle = "v2.24.21 Made By Carey",
+    SubTitle = "v2.25.21 Made By Carey",
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = false,
@@ -34,7 +34,7 @@ local Tabs = {
     Visual = Window:AddTab({ Title = "Visual", Icon = "rbxassetid://10709819149" }),
     Info = Window:AddTab({ Title = "Info", Icon = "rbxassetid://10723415903" }),
     Settings = Window:AddTab({ Title = "Configuration", Icon = "rbxassetid://7734052335" }),
-    Extension = Window:AddTab({ Title = "Universal", Icon = "rbxassetid://10734930886" })
+    Extension = Window:AddTab({ Title = "Extension", Icon = "rbxassetid://10734930886" })
 }
 
 local Options = Fluent.Options
@@ -2393,24 +2393,6 @@ RS.RenderStepped:Connect(function()
     end
 end)
 
-Tabs.Misc:AddKeybind("EB_ToggleKey", {
-    Title = "Easy Bounce Toggle",
-    Mode = "Toggle",
-    Default = "V",
-    Callback = function(State)
-        EB.Enabled = State
-    end
-})
-
-Tabs.Misc:AddDropdown("EB_ModeDropdown", {
-    Title = "Easy Bounce Mode",
-    Values = {"Forward", "Back"},
-    Default = EB.Mode,
-    Callback = function(v)
-        EB.Mode = v
-    end
-})
-
 Tabs.Misc:AddInput("EB_Base", {
     Title = "Base Speed", 
     Default = tostring(EB.BaseSpeed), 
@@ -2432,6 +2414,120 @@ Tabs.Misc:AddInput("EB_Extra", {
     Callback = function(v) 
         EB.ExtraSpeed = tonumber(v) or 100 
     end
+})
+
+Tabs.Misc:AddKeybind("EB_ForwardKeybind", {
+    Title = "Easy Bounce Forward",
+    Mode = "Toggle",
+    Default = "V",
+    Callback = function(State)
+        if State then
+            EB.Enabled = true
+            EB.Mode = "Forward"
+        else
+            if EB.Mode == "Forward" then
+                EB.Enabled = false
+            end
+        end
+    end
+})
+
+Tabs.Misc:AddKeybind("EB_BackKeybind", {
+    Title = "Easy Bounce Back",
+    Mode = "Toggle",
+    Default = "B",
+    Callback = function(State)
+        if State then
+            EB.Enabled = true
+            EB.Mode = "Back"
+        else
+            if EB.Mode == "Back" then
+                EB.Enabled = false
+            end
+        end
+    end
+})
+
+
+Tabs.Misc:AddParagraph({
+        Title = " ",
+        Content = ""
+    })
+    
+DConfiguration = DConfiguration or {}
+DConfiguration.Settings = DConfiguration.Settings or {}
+
+DConfiguration.Misc = DConfiguration.Misc or {}
+DConfiguration.Misc.Utilities = DConfiguration.Misc.Utilities or {}
+DConfiguration.Misc.Utilities.AutoBounce = DConfiguration.Misc.Utilities.AutoBounce or {
+    Power = 50,
+    Distance = 5,
+    Enabled = false
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local bounceConnection = nil
+
+local function updateBounceLogic()
+    if bounceConnection then 
+        bounceConnection:Disconnect() 
+        bounceConnection = nil
+    end
+
+    if not DConfiguration.Misc.Utilities.AutoBounce.Enabled then return end
+
+    bounceConnection = RunService.Heartbeat:Connect(function()
+        local character = LocalPlayer.Character
+        if not (character and character.Parent) then return end 
+        
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        
+        if rootPart and humanoid and humanoid.Health > 0 then
+            if rootPart.Velocity.Y <= 0 then
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {character}
+                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+                
+                local rayOrigin = rootPart.Position
+                local rayDirection = Vector3.new(0, -(DConfiguration.Misc.Utilities.AutoBounce.Distance + 2), 0)
+                
+                local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+                
+                if raycastResult then
+                    local bouncePower = DConfiguration.Misc.Utilities.AutoBounce.Power
+                    
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                    rootPart.Velocity = Vector3.new(rootPart.Velocity.X, bouncePower, rootPart.Velocity.Z)
+                end
+            end
+        end
+    end)
+end
+
+Tabs.Misc:AddInput("AutoBouncePower", {
+    Title = "Auto Bounce Power",
+    Default = tostring(DConfiguration.Misc.Utilities.AutoBounce.Power),
+    Placeholder = "50",
+    Numeric = true,
+    Finished = false,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        DConfiguration.Misc.Utilities.AutoBounce.Power = (num and num > 0) and num or 50
+    end
+})
+
+Tabs.Misc:AddKeybind("AutoBounceKeybind", {
+    Title = "Auto Bounce Toggle",
+    Mode = "Toggle", 
+    Default = "B",
+    Callback = function(Bool)
+        DConfiguration.Misc.Utilities.AutoBounce.Enabled = Bool
+        updateBounceLogic()
+    end,
 })
 
 Tabs.Misc:AddParagraph({
