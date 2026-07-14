@@ -18,7 +18,7 @@ _G.PhantomWyrmXIsAlreadyRunning = true
 
 local Window = Fluent:CreateWindow({
     Title = "PhantomWyrm Hub X - Evade Overhaul│Mobile",
-    SubTitle = "v3.38.17 Made By Carey",
+    SubTitle = "v3.40.19 Made By Carey",
     TabWidth = 160,
     Size = UDim2.fromOffset(540, 390),
     Acrylic = false,
@@ -31,7 +31,7 @@ local Tabs = {
     Nextbots = Window:AddTab({ Title = "Anti Nextbots", Icon = "shield" }),
     Misc = Window:AddTab({ Title = "Movement", Icon = "rbxassetid://7734068321" }),
     Exploits = Window:AddTab({ Title = "Exploits", Icon = "bomb" }),
-    Visual = Window:AddTab({ Title = "Visuals", Icon = "rbxassetid://10709819149" }),
+    Visual = Window:AddTab({ Title = "Visual", Icon = "rbxassetid://10709819149" }),
     Info = Window:AddTab({ Title = "Info", Icon = "rbxassetid://10723415903" }),
     Settings = Window:AddTab({ Title = "Configuration", Icon = "rbxassetid://7734052335" }),
     Extension = Window:AddTab({ Title = "Extension", Icon = "rbxassetid://10734930886" }),
@@ -4392,11 +4392,8 @@ local Dropdown = Tabs.Misc:AddDropdown("LagMode", {
         DConfiguration.Misc.Utilities.LagSwitch.Mode = Value
     end)
 
-Tabs.Misc:AddParagraph({
-        Title = " ",
-        Content = ""
-    })
-    
+Tabs.Misc:AddSection("Adjustments Bounce")
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -4501,6 +4498,11 @@ Tabs.Misc:AddInput("SuperBounceSize", {
         DFunctions.UpdateButton("SuperBounceButton", 0.1 + DConfiguration.Settings.GuiScale.SuperBounce, 0.1 + DConfiguration.Settings.GuiScale.SuperBounce)
     end
 })
+
+Tabs.Misc:AddParagraph({
+        Title = " ",
+        Content = ""
+    })
 
 local ToggleRegular = Tabs.Misc:AddToggle("BounceBtnShow", {
     Title = "Bounce (Button)", 
@@ -4677,15 +4679,6 @@ RS.RenderStepped:Connect(function()
     end
 end)
 
-Tabs.Misc:AddDropdown("EB_ModeDropdown", {
-    Title = "Easy Bounce Mode",
-    Values = {"Forward", "Back"},
-    Default = EB.Mode,
-    Callback = function(v)
-        EB.Mode = v
-    end
-})
-
 Tabs.Misc:AddInput("EB_Base", {
     Title = "Base Speed", 
     Default = tostring(EB.BaseSpeed), 
@@ -4710,38 +4703,190 @@ Tabs.Misc:AddInput("EB_Extra", {
 })
 
 DConfiguration.Settings.GuiScale = DConfiguration.Settings.GuiScale or {}
-DConfiguration.Settings.GuiScale.EasyBounce = DConfiguration.Settings.GuiScale.EasyBounce or 0
+DConfiguration.Settings.GuiScale.EB_Forward = DConfiguration.Settings.GuiScale.EB_Forward or 0
+DConfiguration.Settings.GuiScale.EB_Back = DConfiguration.Settings.GuiScale.EB_Back or 0
 
-Tabs.Misc:AddToggle("EB_BtnShow", {
-    Title = "Easy Bounce (Button)", 
+Tabs.Misc:AddToggle("EB_ForwardToggle", {
+    Title = "Easy Bounce Forward (Button)", 
     Default = false
 }):OnChanged(function(s)
     if s then 
-        local offset = DConfiguration.Settings.GuiScale.EasyBounce
-        DFunctions.CreateButton("EB_Btn", EB.Enabled and "BOUNCE: ON" or "BOUNCE: OFF", 0.15 + offset, 0.1 + offset, function(btn) 
-            EB.Enabled = not EB.Enabled 
-            if btn and btn.Text then
-                btn.Text = EB.Enabled and "BOUNCE: ON" or "BOUNCE: OFF"
+        local offset = DConfiguration.Settings.GuiScale.EB_Forward
+        DFunctions.CreateButton("EB_ForwardBtn", EB.Enabled and EB.Mode == "Forward" and "FORWARD: ON" or "FORWARD: OFF", 0.15 + offset, 0.1 + offset, function(btn) 
+            if EB.Enabled and EB.Mode == "Forward" then
+                EB.Enabled = false
+            else
+                EB.Enabled = true
+                EB.Mode = "Forward"
+            end
+            if btn then btn.Text = (EB.Enabled and EB.Mode == "Forward") and "FORWARD: ON" or "FORWARD: OFF" end
+            local backBtn = gameCoreOrWhereverBtnIsStored and gameCoreOrWhereverBtnIsStored:FindFirstChild("EB_BackBtn") 
+            if pcall(function() DFunctions.UpdateButton("EB_BackBtn", 0.15 + DConfiguration.Settings.GuiScale.EB_Back, 0.1 + DConfiguration.Settings.GuiScale.EB_Back) end) then
             end
         end)
     else 
-        EB.Enabled = false
-        DFunctions.DestroyButton("EB_Btn") 
+        if EB.Mode == "Forward" then EB.Enabled = false end
+        DFunctions.DestroyButton("EB_ForwardBtn") 
     end
 end)
 
-Tabs.Misc:AddInput("EB_ButtonSize", {
-    Title = "Easy Bounce (Button Size)",
-    Default = tostring(DConfiguration.Settings.GuiScale.EasyBounce / 0.01), 
+Tabs.Misc:AddInput("EB_ForwardSize", {
+    Title = "Forward Button Size",
+    Default = tostring(DConfiguration.Settings.GuiScale.EB_Forward / 0.01), 
     Placeholder = "0",
     Numeric = true, 
     Finished = false, 
     Callback = function(Value)
         local num = tonumber(Value)
-        DConfiguration.Settings.GuiScale.EasyBounce = (num or 0) * 0.01
-        DFunctions.UpdateButton("EB_Btn", 0.15 + DConfiguration.Settings.GuiScale.EasyBounce, 0.1 + DConfiguration.Settings.GuiScale.EasyBounce)
+        DConfiguration.Settings.GuiScale.EB_Forward = (num or 0) * 0.01
+        DFunctions.UpdateButton("EB_ForwardBtn", 0.15 + DConfiguration.Settings.GuiScale.EB_Forward, 0.1 + DConfiguration.Settings.GuiScale.EB_Forward)
     end
 })
+
+Tabs.Misc:AddToggle("EB_BackToggle", {
+    Title = "Easy Bounce Back (Button)", 
+    Default = false
+}):OnChanged(function(s)
+    if s then 
+        local offset = DConfiguration.Settings.GuiScale.EB_Back
+        DFunctions.CreateButton("EB_BackBtn", EB.Enabled and EB.Mode == "Back" and "BACK: ON" or "BACK: OFF", 0.15 + offset, 0.1 + offset, function(btn) 
+            if EB.Enabled and EB.Mode == "Back" then
+                EB.Enabled = false
+            else
+                EB.Enabled = true
+                EB.Mode = "Back"
+            end
+            if btn then btn.Text = (EB.Enabled and EB.Mode == "Back") and "BACK: ON" or "BACK: OFF" end
+        end)
+    else 
+        if EB.Mode == "Back" then EB.Enabled = false end
+        DFunctions.DestroyButton("EB_BackBtn") 
+    end
+end)
+
+Tabs.Misc:AddInput("EB_BackSize", {
+    Title = "Back Button Size",
+    Default = tostring(DConfiguration.Settings.GuiScale.EB_Back / 0.01), 
+    Placeholder = "0",
+    Numeric = true, 
+    Finished = false, 
+    Callback = function(Value)
+        local num = tonumber(Value)
+        DConfiguration.Settings.GuiScale.EB_Back = (num or 0) * 0.01
+        DFunctions.UpdateButton("EB_BackBtn", 0.15 + DConfiguration.Settings.GuiScale.EB_Back, 0.1 + DConfiguration.Settings.GuiScale.EB_Back)
+    end
+})
+
+
+Tabs.Misc:AddParagraph({
+        Title = " ",
+        Content = ""
+    })
+
+DConfiguration = DConfiguration or {}
+DConfiguration.Settings = DConfiguration.Settings or {}
+DConfiguration.Settings.GuiScale = DConfiguration.Settings.GuiScale or {}
+DConfiguration.Settings.GuiScale.AutoBounce = DConfiguration.Settings.GuiScale.AutoBounce or 0
+
+DConfiguration.Misc = DConfiguration.Misc or {}
+DConfiguration.Misc.Utilities = DConfiguration.Misc.Utilities or {}
+DConfiguration.Misc.Utilities.AutoBounce = DConfiguration.Misc.Utilities.AutoBounce or {
+    Power = 50,
+    Distance = 5,
+}
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+getgenv().AutoBounceActiveGlobal = getgenv().AutoBounceActiveGlobal or false
+local bounceConnection = nil
+
+local function updateBounceLogic()
+    if bounceConnection then 
+        bounceConnection:Disconnect() 
+        bounceConnection = nil
+    end
+
+    if not getgenv().AutoBounceActiveGlobal then return end
+
+    bounceConnection = RunService.Heartbeat:Connect(function()
+        local character = LocalPlayer.Character
+        if not (character and character.Parent) then return end 
+        
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        local humanoid = character:FindFirstChildOfClass("Humanoid")
+        
+        if rootPart and humanoid and humanoid.Health > 0 then
+            if rootPart.Velocity.Y <= 0 then
+                local raycastParams = RaycastParams.new()
+                raycastParams.FilterDescendantsInstances = {character}
+                raycastParams.FilterType = Enum.RaycastFilterType.Exclude
+                
+                local rayOrigin = rootPart.Position
+                local rayDirection = Vector3.new(0, -(DConfiguration.Misc.Utilities.AutoBounce.Distance + 2), 0)
+                
+                local raycastResult = workspace:Raycast(rayOrigin, rayDirection, raycastParams)
+                
+                if raycastResult then
+                    local bouncePower = DConfiguration.Misc.Utilities.AutoBounce.Power
+                    
+                    humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                    rootPart.Velocity = Vector3.new(rootPart.Velocity.X, bouncePower, rootPart.Velocity.Z)
+                end
+            end
+        end
+    end)
+end
+
+Tabs.Misc:AddInput("AutoBounceButtonSize", {
+    Title = "Auto Bounce Gui Size",
+    Default = tostring(DConfiguration.Settings.GuiScale.AutoBounce * 100),
+    Placeholder = "0",
+    Numeric = true, 
+    Finished = false, 
+    Callback = function(Value)
+        local num = tonumber(Value)
+        DConfiguration.Settings.GuiScale.AutoBounce = num and (num * 0.01) or 0
+        DFunctions.UpdateButton("AutoBounceButton", 0.15 + DConfiguration.Settings.GuiScale.AutoBounce, 0.1 + DConfiguration.Settings.GuiScale.AutoBounce)
+    end
+})
+
+Tabs.Misc:AddInput("AutoBouncePower", {
+    Title = "Auto Bounce Power",
+    Default = tostring(DConfiguration.Misc.Utilities.AutoBounce.Power),
+    Placeholder = "50",
+    Numeric = true,
+    Finished = false,
+    Callback = function(Value)
+        local num = tonumber(Value)
+        DConfiguration.Misc.Utilities.AutoBounce.Power = (num and num > 0) and num or 50
+    end
+})
+
+local Toggle = Tabs.Misc:AddToggle("AutoBounceToggle", {Title = "Auto Bounce (Button)", Default = false})
+
+Toggle:OnChanged(function(State)
+    if State then
+        local offset = DConfiguration.Settings.GuiScale.AutoBounce
+        
+        DFunctions.CreateButton("AutoBounceButton", getgenv().AutoBounceActiveGlobal and "Auto: ON" or "Auto: OFF", 0.15 + offset, 0.1 + offset, function(btn)
+            getgenv().AutoBounceActiveGlobal = not getgenv().AutoBounceActiveGlobal
+            if btn then
+                btn.Text = getgenv().AutoBounceActiveGlobal and "Auto: ON" or "Auto: OFF"
+            end
+            updateBounceLogic()
+        end)
+        
+        updateBounceLogic()
+    else
+        getgenv().AutoBounceActiveGlobal = false
+        updateBounceLogic()
+        DFunctions.DestroyButton("AutoBounceButton")
+    end
+end)
+
+
 
 Tabs.Misc:AddParagraph({
         Title = " ",
@@ -6022,7 +6167,7 @@ end
 
 Tabs.Exploits:AddButton({
         Title = "Boombox",
-        Description = "Not Visual",
+        Description = "Not Visual (Touch this button only 1!",
         Callback = function()
             loadstring(game:HttpGet("https://darahub.pages.dev/api/script/obfuscated/Fe/Boomboxs/EvadeOverhaul-RelicsXYZ.lua"))()
         end
@@ -6033,45 +6178,159 @@ local FakeSection = Tabs.Exploits:AddSection("Pads")
 
 do
     local TeleportModule = {
-        SelectedTP = nil,
-        AvailableTPs = {},
+        Enabled = false,
+        ActiveUI = nil,
+        Scroll = nil,
         LastCount = 0
     }
 
+    local tweenService = game:GetService("TweenService")
     local runService = game:GetService("RunService")
     local repStorage = game:GetService("ReplicatedStorage")
     local lp = game.Players.LocalPlayer
     local deployables = workspace:WaitForChild("Game"):WaitForChild("Effects"):WaitForChild("Deployables")
     local event = repStorage:WaitForChild("Events"):WaitForChild("Other"):WaitForChild("DeployableUsed")
 
-    local tpDropdown = Tabs.Exploits:AddDropdown("TeleporterList", {
-        Title = "Select Teleporter",
-        Values = {"None"},
-        Default = 1,
-        Callback = function(Value)
-            TeleportModule.SelectedTP = Value
-        end
-    })
+    local function CreateBaseWindow(size, titleText)
+        local sg = Instance.new("ScreenGui")
+        sg.Name = "PhantomTeleport_UI"
+        sg.ResetOnSpawn = false
+        sg.Parent = game:GetService("CoreGui") or lp:WaitForChild("PlayerGui")
+        
+        local frame = Instance.new("Frame", sg)
+        frame.Size = size
+        frame.Position = UDim2.new(0.5, -size.X.Offset/2, 0.5, -size.Y.Offset/2)
+        frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+        frame.BackgroundTransparency = 0.1
+        frame.BorderSizePixel = 0
+        frame.Active = true
+        
+        Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
+        
+        local grad = Instance.new("UIGradient", frame)
+        grad.Color = ColorSequence.new({
+            ColorSequenceKeypoint.new(0, Color3.fromRGB(12, 12, 12)), 
+            ColorSequenceKeypoint.new(0.3, Color3.fromRGB(45, 45, 45)), 
+            ColorSequenceKeypoint.new(0.5, Color3.fromRGB(12, 12, 12)),
+            ColorSequenceKeypoint.new(0.8, Color3.fromRGB(45, 45, 45)),
+            ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 12, 12))  
+        })
+        grad.Rotation = 45
+        grad.Offset = Vector2.new(-1, 0)
+        
+        task.spawn(function()
+            local tweenInfo = TweenInfo.new(4, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut, -1, true)
+            local tween = tweenService:Create(grad, tweenInfo, {Offset = Vector2.new(1, 0)})
+            tween:Play()
+        end)
+        
+        local stroke = Instance.new("UIStroke", frame)
+        stroke.Thickness = 2
+        stroke.Color = Color3.fromRGB(0, 0, 0)
+        
+        local title = Instance.new("TextLabel", frame)
+        title.Size = UDim2.new(1, 0, 0, 35)
+        title.BackgroundTransparency = 1
+        title.Text = titleText
+        title.TextColor3 = Color3.fromRGB(255, 255, 255)
+        title.Font = Enum.Font.GothamBold
+        title.TextSize = 14
+        
+        return sg, frame
+    end
 
-    Tabs.Exploits:AddButton({
-        Title = "Teleport",
-        Description = "Must be standing on a teleporter",
-        Callback = function()
-            if TeleportModule.SelectedTP and TeleportModule.SelectedTP ~= "None" then
-                for _, obj in pairs(deployables:GetChildren()) do
-                    if obj.Name == "Teleporter" and tostring(obj:GetDebugId()) == TeleportModule.SelectedTP then
+    local function GetPlacerName(obj)
+        local creatorVal = obj:FindFirstChild("Creator") or obj:FindFirstChild("Owner")
+        if creatorVal and creatorVal:IsA("ObjectValue") and creatorVal.Value then
+            return creatorVal.Value.Name
+        elseif creatorVal and creatorVal:IsA("StringValue") then
+            return creatorVal.Value
+        end
+        return "Unknown"
+    end
+
+    local function DestroyUI()
+        if TeleportModule.ActiveUI then
+            TeleportModule.ActiveUI:Destroy()
+            TeleportModule.ActiveUI = nil
+        end
+        TeleportModule.Scroll = nil
+    end
+
+    local function StartUI()
+        if TeleportModule.ActiveUI then return end
+        
+        local sg, frame = CreateBaseWindow(UDim2.new(0, 260, 0, 200), "Phantom Teleports")
+        TeleportModule.ActiveUI = sg
+        
+        local scroll = Instance.new("ScrollingFrame", frame)
+        scroll.Size = UDim2.new(0.9, 0, 0.75, 0)
+        scroll.Position = UDim2.new(0.05, 0, 0.18, 0)
+        scroll.BackgroundTransparency = 1
+        scroll.BorderSizePixel = 0
+        scroll.ScrollBarThickness = 3
+        scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+        scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        TeleportModule.Scroll = scroll
+    end
+
+    local function UpdateList(foundObjects, root)
+        if not TeleportModule.Scroll then return end
+        TeleportModule.Scroll:ClearAllChildren()
+        
+        local layout = Instance.new("UIListLayout", TeleportModule.Scroll)
+        layout.SortOrder = Enum.SortOrder.LayoutOrder
+        layout.Padding = UDim.new(0, 4)
+        
+        for _, obj in pairs(foundObjects) do
+            if obj.Name == "Teleporter" then
+                local primary = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+                if primary then
+                    local dist = math.floor((root.Position - primary.Position).Magnitude)
+                    local placer = GetPlacerName(obj)
+                    
+                    local card = Instance.new("TextButton", TeleportModule.Scroll)
+                    card.Size = UDim2.new(1, 0, 0, 32)
+                    card.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                    card.BackgroundTransparency = 0.3
+                    card.Text = ""
+                    Instance.new("UICorner", card).CornerRadius = UDim.new(0, 6)
+                    
+                    local stroke = Instance.new("UIStroke", card)
+                    stroke.Thickness = 1
+                    stroke.Color = Color3.fromRGB(50, 50, 50)
+                    
+                    local info = Instance.new("TextLabel", card)
+                    info.Size = UDim2.new(1, -10, 1, 0)
+                    info.Position = UDim2.new(0, 5, 0, 0)
+                    info.BackgroundTransparency = 1
+                    info.Text = placer .. " [" .. dist .. " studs]"
+                    info.TextColor3 = Color3.fromRGB(230, 230, 230)
+                    info.Font = Enum.Font.Gotham
+                    info.TextSize = 11
+                    info.TextXAlignment = Enum.TextXAlignment.Left
+                    
+                    card.MouseButton1Click:Connect(function()
                         event:FireServer(obj)
-                        break
-                    end
+                    end)
                 end
             end
         end
-    })
+    end
 
     runService.Heartbeat:Connect(function()
+        if not TeleportModule.Enabled then
+            DestroyUI()
+            TeleportModule.LastCount = 0
+            return
+        end
+
         local char = lp.Character
         local root = char and char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
+        if not root then 
+            DestroyUI()
+            return 
+        end
 
         local nearTP = false
         local currentList = {}
@@ -6091,21 +6350,32 @@ do
         end
 
         if nearTP then
+            StartUI()
             if #currentList ~= TeleportModule.LastCount then
                 TeleportModule.LastCount = #currentList
-                TeleportModule.AvailableTPs = currentList
-                tpDropdown:SetValues(currentList)
+                UpdateList(foundObjects, root)
             end
         else
             if TeleportModule.LastCount > 0 then
                 TeleportModule.LastCount = 0
-                TeleportModule.AvailableTPs = {}
-                TeleportModule.SelectedTP = nil
-                tpDropdown:SetValues({"None"})
+                DestroyUI()
             end
         end
     end)
+
+    Tabs.Exploits:AddToggle("TeleportMenuToggle", {
+        Title = "Teleport No Cooldown",
+        Description = "",
+        Default = false,
+        Callback = function(Value)
+            TeleportModule.Enabled = Value
+            if not Value then
+                DestroyUI()
+            end
+        end
+    })
 end
+
 
 do
     local RunService = game:GetService("RunService")
