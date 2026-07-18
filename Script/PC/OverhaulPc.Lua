@@ -1,10 +1,17 @@
-local Fluent = loadstring(game:HttpGet(""))()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer then
+    LocalPlayer:Kick("Sorry, the script is closed.")
+end
+
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/SaveManager.lua"))()
 local FBM = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/FloatingButton.Lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/InterfaceManager.lua"))()
 
 
-if not Fluent or not SaveManager or not InterfaceManager or not FBM then return game.Players.LocalPlayer:Kick("Script Closed ") end
+if not Fluent or not SaveManager or not InterfaceManager or not FBM then return game.Players.LocalPlayer:Kick("UI not loaded!") end
 
 if _G.PhantomWyrmXIsAlreadyRunning then
    game:GetService("StarterGui"):SetCore("SendNotification", {
