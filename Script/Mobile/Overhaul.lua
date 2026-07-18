@@ -1,10 +1,17 @@
-local Fluent = loadstring(game:HttpGet(""))()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+if LocalPlayer then
+    LocalPlayer:Kick("Sorry, the script is closed.")
+end
+
+local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/SaveManager.lua"))()
 local FBM = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/FloatingButton.Lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/InterfaceManager.lua"))()
 
 
-if not Fluent or not SaveManager or not InterfaceManager or not FBM then return game.Players.LocalPlayer:Kick("Script Closed") end
+if not Fluent or not SaveManager or not InterfaceManager or not FBM then return game.Players.LocalPlayer:Kick("UI not loaded!") end
 
 if _G.PhantomWyrmXIsAlreadyRunning then
    game:GetService("StarterGui"):SetCore("SendNotification", {
@@ -1188,19 +1195,20 @@ function DFunctions.Noclip()
 end
 
 function DFunctions.GetDownedPlayer()
-    for i,v in pairs(Workspace.Game.Players:GetChildren()) do
+    for i,v in pairs(WorkspacePlayers:GetChildren()) do
         if v:GetAttribute("Downed") then
             return v
         end
     end
 end
 
+
 function DFunctions.GetObjective()
-    local ObjectiveFolder = Workspace.Game.Map.Parts:FindFirstChild("Objectives")
+    local MapFolder = workspace:FindFirstChild("Map")
+    local ObjectiveFolder = MapFolder and MapFolder:FindFirstChild("Parts") and MapFolder.Parts:FindFirstChild("Objectives")
     if not ObjectiveFolder then return nil end
 
     local Parts = {}
-
     for _, v in ipairs(ObjectiveFolder:GetChildren()) do
         if v:IsA("Model") then
             local part = v:FindFirstChildWhichIsA("BasePart")
@@ -1210,14 +1218,10 @@ function DFunctions.GetObjective()
         end
     end
 
-    if #Parts == 0 then
-        return nil
-    end
-
+    if #Parts == 0 then return nil end
     return Parts[math.random(1, #Parts)]
 end
 
-local FarmPart
 
 function DFunctions.AFKFarming()
     local character = LocalPlayer.Character
@@ -1282,11 +1286,16 @@ function DFunctions.TicketsFarming()
 
     DConfiguration.AutoFarm.FarmingStates.IsCollectingTickets = false
 
-    for _, v in ipairs(Workspace.Game.Effects.Tickets:GetDescendants()) do
-        if v:IsA("BasePart") and v.Name == "HumanoidRootPart" then
-            hrp.CFrame = CFrame.new(v.Position)
-            DConfiguration.AutoFarm.FarmingStates.IsCollectingTickets = true
-            return
+    local EffectsFolder = workspace:FindFirstChild("Effects") or (workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Effects"))
+    local TicketsFolder = EffectsFolder and EffectsFolder:FindFirstChild("Tickets")
+    
+    if TicketsFolder then
+        for _, v in ipairs(TicketsFolder:GetDescendants()) do
+            if v:IsA("BasePart") and v.Name == "HumanoidRootPart" then
+                hrp.CFrame = CFrame.new(v.Position)
+                DConfiguration.AutoFarm.FarmingStates.IsCollectingTickets = true
+                return
+            end
         end
     end
     
@@ -1328,7 +1337,9 @@ local LoadoutNames = {}
 
 function DFunctions.GetEmotesName()
     EmoteNames = {}
-    local emotesFolder = game:GetService("ReplicatedStorage").Items.Emotes
+    local itemsFolder = game:GetService("ReplicatedStorage"):WaitForChild("Items")
+local emotesFolder = itemsFolder:WaitForChild("BaseItems"):WaitForChild("Emotes")
+
 
     for _, thing in ipairs(emotesFolder:GetChildren()) do
         if thing:IsA("LocalScript") or thing:IsA("ModuleScript") then
@@ -1344,7 +1355,7 @@ end
 
 function DFunctions.GetLoadoutName()
     LoadoutNames = {}
-    local loadoutFolder = game:GetService("ReplicatedStorage").Items.Loadout
+    local loadoutFolder = game:GetService("ReplicatedStorage").Items.BaseItems.Loadout
 
     for _, thing in ipairs(loadoutFolder:GetChildren()) do
         if thing:IsA("LocalScript") or thing:IsA("ModuleScript") then
@@ -1362,32 +1373,31 @@ DFunctions.GetEmotesName()
 DFunctions.GetLoadoutName()
 
 function DFunctions.AntiNextbot()
-    if Workspace:FindFirstChild("Game") and game.Workspace.Game:FindFirstChild("Players") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+    if WorkspacePlayers and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local localPlayerInstance = WorkspacePlayers:FindFirstChild(LocalPlayer.Name)
+        local playerTeam = localPlayerInstance and localPlayerInstance:GetAttribute("Team")
+        if playerTeam == "Nextbot" then return end
     
-        local playerTeam = Workspace.Game.Players[LocalPlayer.Name]:GetAttribute("Team")
-        if playerTeam == "Nextbot" then
-            return 
-        end
-    
-        for i, v in pairs(Workspace.Game.Players:GetDescendants()) do
+        for i, v in pairs(WorkspacePlayers:GetDescendants()) do
             if v:IsA("Model") and v:GetAttribute("Team") == "Nextbot" then
                 local humanoidRootPart = v:FindFirstChild("HumanoidRootPart") or v:FindFirstChild("HRP")
                 if humanoidRootPart then
-                    if not LocalPlayer.Character and not LocalPlayer.Character.HumanoidRootPart then 
-                        return
-                    end
-                    
+                    if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
                     local distance = (LocalPlayer.Character.HumanoidRootPart.Position - humanoidRootPart.Position).Magnitude
                     
                     if distance < DConfiguration.Nextbots.AntiNextbotRange then
                         if DConfiguration.Nextbots.AntiNextbotType == "Spawn" then
-                            local parts = workspace.Game.Map.ItemSpawns:GetChildren()
-                            local randomPart = parts[math.random(1, #parts)]
-                            LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(randomPart.Position)
+                            local map = workspace:FindFirstChild("Map")
+                            local parts = map and map:FindFirstChild("ItemSpawns") and map.ItemSpawns:GetChildren()
+                            if parts and #parts > 0 then
+                                local randomPart = parts[math.random(1, #parts)]
+                                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(randomPart.Position)
+                            end
                         elseif DConfiguration.Nextbots.AntiNextbotType == "Players" then
-                            local randomPlayer = Players:GetPlayers()[math.random(1, #game.Players:GetPlayers())]
-                            if randomPlayer then
-                              LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(randomPlayer.Character.Head.Position.X, randomPlayer.Character.Head.Position.Y, randomPlayer.Character.Head.Position.Z)
+                            local allPlrs = WorkspacePlayers:GetPlayers()
+                            local randomPlayer = allPlrs[math.random(1, #allPlrs)]
+                            if randomPlayer and randomPlayer.Character and randomPlayer.Character:FindFirstChild("Head") then
+                              LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(randomPlayer.Character.Head.Position)
                             end
                         end
                     end
@@ -1781,7 +1791,7 @@ function DFunctions.BounceFunction()
     end
 end
 
-local WorkspacePlayers = game:GetService("Workspace").Game.Players
+local WorkspacePlayers = game:GetService("Players")
 
 function DFunctions.getNearestDownedPlayer()
     local nearestPlayer = nil
@@ -1946,7 +1956,8 @@ function DFunctions.ModifyEdgeTrimp()
         DConfiguration.Misc.Utilities.EdgeTrimpModification.HeightMultiplier
 end
 
-local WorkspacePlayers = game:GetService("Workspace").Game.Players
+local WorkspacePlayers = game:GetService("Players")
+
 
 function DFunctions.getNearestDownedPlayer()
     local nearestPlayer = nil
@@ -2543,10 +2554,6 @@ end)
 if player.Character then
     DFunctions.UpdateVisuals()
 end
-
-
-
--- Topic
 
 -- Main
 
