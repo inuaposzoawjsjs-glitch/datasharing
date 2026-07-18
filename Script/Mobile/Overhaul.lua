@@ -1,4 +1,4 @@
-local Fluent = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/main.lua"))()
+local Fluent = loadstring(game:HttpGet(""))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/SaveManager.lua"))()
 local FBM = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/FloatingButton.Lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/InterfaceManager.lua"))()
