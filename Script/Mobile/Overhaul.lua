@@ -4,7 +4,7 @@ local FBM = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzo
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/inuaposzoawjsjs-glitch/AloeliuEJGJPWFJGWJSGPKSGM/main/Fluent/InterfaceManager.lua"))()
 
 
-if not Fluent or not SaveManager or not InterfaceManager or not FBM then return game.Players.LocalPlayer:Kick("Script for updating ") end
+if not Fluent or not SaveManager or not InterfaceManager or not FBM then return game.Players.LocalPlayer:Kick("Script Closed") end
 
 if _G.PhantomWyrmXIsAlreadyRunning then
    game:GetService("StarterGui"):SetCore("SendNotification", {
